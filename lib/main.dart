@@ -4,6 +4,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'screens/home_page.dart';
+
+// 1. Реализовала интерфейс TodoRepository, используя БД (Shared Preferences).
+// 2. Реализовала экран добавления задачи и навигацию к нему (screens/add_todo_page.dart).
+// 3. Реализовала удаление задачи с подтверждением (Dialog).
+
 class TodoItem {
   final String id;
   final String title;
@@ -128,147 +134,6 @@ class TaskApp extends StatelessWidget {
       title: 'Persistence Task',
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
       home: const HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Tasks')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddTodoPage()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: StreamBuilder<List<TodoItem>>(
-        stream: repo.getTodos(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final todos = snapshot.data!;
-          if (todos.isEmpty) {
-            return const Center(child: Text('No tasks yet. Add one!'));
-          }
-
-          return ListView.builder(
-            itemCount: todos.length,
-            itemBuilder: (context, i) {
-              final todo = todos[i];
-              return ListTile(
-                leading: Checkbox(
-                  value: todo.isCompleted,
-                  onChanged: (_) => repo.toggleTodo(todo.id),
-                ),
-                title: Text(
-                  todo.title,
-                  style: TextStyle(
-                    decoration: todo.isCompleted
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                subtitle:
-                    Text("Due: ${todo.dueDate.toString().split(' ')[0]}"),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: const Text("Delete task?"),
-                        content: Text(todo.title),
-                        actions: [
-                          TextButton(
-                            onPressed: () =>
-                                Navigator.pop(context, false),
-                            child: const Text("Cancel"),
-                          ),
-                          FilledButton(
-                            onPressed: () =>
-                                Navigator.pop(context, true),
-                            child: const Text("Delete"),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirm == true) {
-                      await repo.deleteTodo(todo.id);
-                    }
-                  },
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class AddTodoPage extends StatefulWidget {
-  const AddTodoPage({super.key});
-
-  @override
-  State<AddTodoPage> createState() => _AddTodoPageState();
-}
-
-class _AddTodoPageState extends State<AddTodoPage> {
-  final _controller = TextEditingController();
-  DateTime? _selectedDate;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Add Task")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(labelText: "Task title"),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime(2100),
-                  initialDate: DateTime.now(),
-                );
-                if (date != null) setState(() => _selectedDate = date);
-              },
-              child: Text(
-                _selectedDate == null
-                    ? "Choose due date"
-                    : "Due: ${_selectedDate!.toString().split(' ')[0]}",
-              ),
-            ),
-            const Spacer(),
-            FilledButton(
-              onPressed: () async {
-                if (_controller.text.isEmpty || _selectedDate == null) return;
-
-                await repo.addTodo(_controller.text, _selectedDate!);
-                Navigator.pop(context);
-              },
-              child: const Text("Add task"),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
