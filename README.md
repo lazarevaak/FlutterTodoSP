@@ -1,16 +1,15 @@
-# persistence_example_1
+# FlutterTodoSP
 
-A new Flutter project.
+## Описание проекта
 
-## Getting Started
+FlutterTodoSP — это простое и удобное приложение для ведения списка задач, созданное на Flutter.  
+Приложение использует локальную базу данных на основе SharedPreferences и демонстрирует базовые принципы работы с хранилищем, навигацией и состоянием во Flutter.
 
-This project is a starting point for a Flutter application.
+Пользователь может добавлять новые задачи, указывать дату выполнения, отмечать задачи как выполненные и удалять их с подтверждением. 
 
-A few resources to get you started if this is your first Flutter project:
+Все изменения сохраняются локально и отображаются в режиме реального времени.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Реализовано:
+- Интерфейс TodoRepository с помощью БД (Shared Preferences).
+- Экран добавления задачи и навигацию к нему (screens/add_todo_page.dart).
+- Удаление задачи с подтверждением (Dialog).
